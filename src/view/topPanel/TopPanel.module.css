@@ -1,11 +1,23 @@
 .topPanel {
   width: 100vw;
   height: var(--topPanelHeight);
-  background-color: #dadce0;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   padding: 10px;
+  z-index: 2;
+  position: relative;
+}
+
+.toolBar {
+  display: inline-block;
+  margin: 0 0 0 100px;
+}
+
+.slideButtonBar {
+  display: inline-block;
 }
 
 .title {
+  display: block;
   background-color: transparent;
   border: none;
   font-size: 16px;

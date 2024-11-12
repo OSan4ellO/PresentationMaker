@@ -1,0 +1,22 @@
+.slideList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  z-index: 1;
+  position: relative;
+  /* width: 212px; */
+  border-right: 1px solid #dadce0;
+}
+
+.slideList::-webkit-scrollbar-thumb {
+  color: green;
+  border-radius: 10px;
+}
+
+.item {
+  margin: 10px;
+  user-select: none;
+  pointer-events: none;
+  /* border-radius: 10px; */
+}
