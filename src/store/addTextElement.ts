@@ -3,8 +3,6 @@ import { nanoid } from 'nanoid';
 import { TextObjectType } from "./PresentationType.ts";
 
 function addTextElement(editor: EditorType): EditorType {
-    console.log('editor', editor);
-
     const newElemId = nanoid(8);
     const userText = prompt("Enter text to add to slide:");
     if (!userText) {
@@ -14,6 +12,8 @@ function addTextElement(editor: EditorType): EditorType {
     if (!editor.selection || !editor.selection.selectedSlideId) {
         return editor;
     }
+
+	 console.log('editor', editor);
 
     const changeableSlideId = editor.selection.selectedSlideId;
     const changeableSlideIndex = editor.presentation.slides.findIndex(slide => slide.id === changeableSlideId);

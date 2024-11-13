@@ -12,6 +12,7 @@
   "dependencies": {
     "nanoid": "^5.0.8",
     "react": "^18.3.1",
+    "react-color-palette": "^7.3.0",
     "react-dom": "^18.3.1",
     "uuid": "^11.0.2"
   },
@@ -20,6 +21,7 @@
     "@types/eslint__js": "^8.42.3",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
+    "@types/react-native": "^0.72.8",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^4.3.3",
     "css-loader": "^7.1.2",

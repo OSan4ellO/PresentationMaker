@@ -6,12 +6,18 @@ import {renamePresentationTitle} from "../../store/renamePresentationTitle.ts";
 import { addSlide } from '../../store/addSlide.ts';
 import * as React from "react";
 import { addTextElement } from '../../store/addTextElement.ts';
+import { addPhotoElement } from '../../store/addPhotoElement.ts';
+import { changeBackground } from '../../store/changeBackground.ts';
+
+
+
 
 type TopPanelProps = {
     title: string,
 }
 
 function TopPanel({title}: TopPanelProps) {
+
     function onAddSlide() {
 		dispatch(addSlide)
     }
@@ -20,10 +26,15 @@ function TopPanel({title}: TopPanelProps) {
         dispatch(removeSlide)
     }
 
-	 function addPhotoElement() {}
+	 function onaddPhotoElement() {
+		dispatch(addPhotoElement)
+	 }
 
 	 function onAddTextElement() {
 		dispatch(addTextElement)
+	 }
+	 function onchangeBackground() {
+		dispatch(changeBackground)
 	 }
 
     const onTitleChange: React.ChangeEventHandler = (event) => {
@@ -39,7 +50,9 @@ function TopPanel({title}: TopPanelProps) {
             </div>
 				<div className={styles.toolBar}>
 					<Button className={styles.button} text={'Add text'} onClick={onAddTextElement}></Button>
-					<Button className={styles.button} text={'Add image'} onClick={addPhotoElement}></Button>
+					<Button className={styles.button} text={'Add image'} onClick={onaddPhotoElement}></Button>
+					<Button className={styles.button} text={'Change slide color'} onClick={onchangeBackground}></Button>
+					<Button className={styles.button} text={'Change background'} onClick={onaddPhotoElement}></Button>
 				</div>
         </div>
     )
