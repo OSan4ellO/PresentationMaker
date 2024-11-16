@@ -1,7 +1,8 @@
 import {PresentationType} from "./PresentationType.ts";
 
 type SelectionType = {
-    selectedSlideId: string | null
+    selectedSlideId: string | null,
+	 selectedObjectId: string | null,
 }
 
 type EditorType = {

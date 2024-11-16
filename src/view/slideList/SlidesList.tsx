@@ -25,11 +25,10 @@ function SlidesList({slides, selection}: SlidesListPros) {
 			  {slides.map(slide =>
 					<div key={slide.id} onClick={() => onSlideClick(slide.id)}>
 						 <Slide
-							  slide={slide}
-							  scale={SLIDE_PREVIEW_SCALE}
-							  isSelected={selection ? slide.id === selection.selectedSlideId : false}
-							  className={styles.item}
-						 ></Slide>
+						  slide={slide}
+						  scale={SLIDE_PREVIEW_SCALE}
+						  isSelected={selection ? slide.id === selection.selectedSlideId : false}
+						  className={styles.item} selectedObjectId={null}						 ></Slide>
 					</div>
 			  )}
 		 </div>

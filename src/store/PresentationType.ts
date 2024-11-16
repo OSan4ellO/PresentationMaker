@@ -6,10 +6,22 @@ type PresentationType = {
 type SlideType = {
     id: string,
     objects: Array<SlideObject>,
-    background: string,
+    background: Background,
 }
 
 type SlideObject = TextObjectType | ImageObjectType
+
+type Background = SolidBackground | ImageBackground;
+
+type SolidBackground = {
+	type: 'solid',
+	color: string;
+}
+
+type ImageBackground = {
+	type: 'image',
+	src: string;
+}
 
 type BaseSlideObject = {
     id: string,

@@ -1,8 +1,9 @@
 import styles from './App.module.css'
 import {SlidesList} from "./view/slideList/SlidesList.tsx";
 import {TopPanel} from "./view/topPanel/TopPanel.tsx";
-import {Workspace} from "./view/workSpace/Workspace.tsx";
 import {EditorType} from "./store/EditorType.ts";
+import { Workspace } from './view/workSpace/Workspace.tsx';
+
 
 type AppProps = {
     editor: EditorType,
@@ -18,7 +19,7 @@ function App({editor}: AppProps) { // получение актуальной м
             <TopPanel title={editor.presentation.title}></TopPanel>
             <div className={styles.container}>
                 <SlidesList slides={editor.presentation.slides} selection={editor.selection}></SlidesList>
-                <Workspace slide={editor.presentation.slides[displayedSlideIndex]}></Workspace>
+                <Workspace slide={editor.presentation.slides[displayedSlideIndex]} selectedObjectId={editor.selection.selectedObjectId}></Workspace>
             </div>
         </>
     )

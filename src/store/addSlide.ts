@@ -5,6 +5,10 @@ import { nanoid } from 'nanoid';
 
 function addSlide(editor: EditorType): EditorType {
 	console.log('editor', editor)
+	
+	if (!editor.selection) {
+		return editor; 
+  }
 // 	const lastSlideId = editor.presentation.slides.reduce((maxId, slide) => {
 // 		const slideNumber = parseInt(slide.id.split('-')[1]);
 // 		return Math.max(maxId, slideNumber);
@@ -17,7 +21,7 @@ function addSlide(editor: EditorType): EditorType {
     const newSlide: SlideType = {
         id: newSlideId,
         objects: [],
-        background: "#ffffff", 
+        background: {type: 'solid', color:'#ffffff'}, 
     };
 
     const newSlides = [...editor.presentation.slides, newSlide];
@@ -29,6 +33,7 @@ function addSlide(editor: EditorType): EditorType {
         },
         selection: {
             selectedSlideId: newSlideId,
+				selectedObjectId: editor.selection.selectedObjectId
         },
     };
 }

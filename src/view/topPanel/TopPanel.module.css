@@ -29,4 +29,18 @@
   margin: 0 3px;
 }
 
+.applyButton {
+  background-color: #ebe0f5b7;
+  border-radius: 5px;
+  margin-top: 5px;
+}
 
+.colorPickerContainer {
+  width: 300px;
+  position: absolute;
+  margin: 0 0 0 850px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  flex-direction: column;
+}

@@ -25,6 +25,7 @@ function removeSlide(editor: EditorType): EditorType {
 		 selection: {
 			  // нет слайдов => удаляем selectedSlideId
 			  selectedSlideId: newSlides.length > 0 ? newSelectedSlideId : null,
+			  selectedObjectId: editor.selection.selectedObjectId
 		 },
 	}
 }

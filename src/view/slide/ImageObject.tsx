@@ -4,9 +4,10 @@ import {CSSProperties} from "react";
 type ImageObjectProps = {
     imageObject: ImageObjectType,
     scale?: number,
+	 isSelected: boolean,
 }
 
-function ImageObject({imageObject, scale = 1}: ImageObjectProps) {
+function ImageObject({imageObject, scale = 1, isSelected}: ImageObjectProps) {
     const imageObjectStyles: CSSProperties = {
         position: 'absolute',
         top: `${imageObject.y * scale}px`,
@@ -14,8 +15,12 @@ function ImageObject({imageObject, scale = 1}: ImageObjectProps) {
         width: `${imageObject.width * scale}px`,
         height: `${imageObject.height * scale}px`,
     }
+	 if (isSelected) {
+		imageObjectStyles.border = '3px solid #0b57d0'
+  }
+
     return (
-        <img style={imageObjectStyles} src={`data:image/jpeg;base64, ${imageObject.src}`}/>
+        <img style={imageObjectStyles} src={`${imageObject.src}`}/>
     )
 }
 

@@ -5,16 +5,17 @@ import styles from './Workspace.module.css'
 
 type WorkspaceProps = {
     slide: SlideType,
+	 selectedObjectId: string | null,
 }
 
-function Workspace({slide}: WorkspaceProps) {
+function Workspace({slide, selectedObjectId}: WorkspaceProps) {
     return (
         <div className={styles.workspace}>
-            <Slide slide={slide} isSelected={false} className={""}></Slide>
+            <Slide slide={slide} isSelected={false} className={""} selectedObjectId={selectedObjectId} ></Slide>
         </div>
     )
 }
 
 export {
-    Workspace,
+	Workspace,
 }
