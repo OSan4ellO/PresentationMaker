@@ -11,7 +11,7 @@ type WorkspaceProps = {
 function Workspace({slide, selectedObjectId}: WorkspaceProps) {
     return (
         <div className={styles.workspace}>
-            <Slide slide={slide} isSelected={false} className={""} selectedObjectId={selectedObjectId} ></Slide>
+            <Slide slide={slide} isSelected={false} className={""} selectedObjectId={selectedObjectId}></Slide>
         </div>
     )
 }

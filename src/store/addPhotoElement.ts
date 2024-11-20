@@ -55,6 +55,7 @@ function addPhotoElement(editor: EditorType): EditorType {
         },
         selection: {
             selectedSlideId: changeableSlideId,
+				selectedObjectId: editor.selection.selectedObjectId
         },
     };
 }

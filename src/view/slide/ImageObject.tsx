@@ -16,7 +16,7 @@ function ImageObject({imageObject, scale = 1, isSelected}: ImageObjectProps) {
         height: `${imageObject.height * scale}px`,
     }
 	 if (isSelected) {
-		imageObjectStyles.border = '3px solid #0b57d0'
+		imageObjectStyles.border = '3px solid #8a2094'
   }
 
     return (

@@ -16,11 +16,11 @@ function TextObject({textObject, scale = 1, isSelected}: TextObjectProps) {
         fontSize: `${textObject.fontSize * scale}px`
     }
 	 if (isSelected) {
-		textObjectStyles.border = '3px solid #0b57d0'
+		textObjectStyles.border = '3px solid #8a2094'
   }
 
     return (
-        <p style={textObjectStyles}>{textObject.text}</p>
+        <p  style={textObjectStyles}>{textObject.text} </p>
     )
 }
 

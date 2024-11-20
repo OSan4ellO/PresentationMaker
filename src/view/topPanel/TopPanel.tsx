@@ -24,8 +24,8 @@ type TopPanelProps = {
 }
 
 function TopPanel({title}: TopPanelProps) {
-
-	const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+	
+	const [isColorPickerOpen, setIsColorPickerOpen] = useState(null);
 	const [color, setColor] = useColor("#561ecb");
 
     function onAddSlide() {
@@ -88,6 +88,7 @@ function TopPanel({title}: TopPanelProps) {
             )}
         </div>
     )
+
 }
 
 export {
