@@ -42,5 +42,5 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: stretch;
-  flex-direction: column;
+  flex-direction: column-reverse;
 }

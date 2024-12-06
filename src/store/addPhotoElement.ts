@@ -1,32 +1,14 @@
 import { EditorType } from "./EditorType.ts";
 import { nanoid } from 'nanoid';
 import { ImageObjectType } from "./PresentationType.ts";
-// import { convertFileToBase64 } from "./imageConverter.ts";
 
 
-function addPhotoElement(editor: EditorType): EditorType {
-
-// 	const input = document.createElement('input');
-// 		let base64code
-// 		input.type = 'file';
-// 		input.accept = 'image/*'; // Только изображения
-// 		input.onchange = (event) => {
-//   		const file = (event.target as HTMLInputElement)?.files?.[0];
-//   		if (file) {
-//     		base64code = await RNFS.readFile(imagePath, 'base64'); // Создаем URL для изображения
-//   }
-// };
-
-   const userBase64 = prompt("Enter base64 code:");
+function addPhotoElement(editor: EditorType, base64Image: string): EditorType {
 
     const newElemId = nanoid(8);
-    if (!userBase64) {
-        return editor;
-    }
-
-    if (!editor.selection || !editor.selection.selectedSlideId) {
-        return editor;
-    }
+	 if (!base64Image || !editor.selection || !editor.selection.selectedSlideId) {
+		return editor;
+  }
 
 	 console.log('editor', editor);
     const changeableSlideId = editor.selection.selectedSlideId;
@@ -39,7 +21,7 @@ function addPhotoElement(editor: EditorType): EditorType {
         width: 100,
         height: 100,
         type: "image",
-        src: userBase64,
+        src: base64Image,
     };
 
     const newSlides = [...editor.presentation.slides];

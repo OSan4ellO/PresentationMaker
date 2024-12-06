@@ -27,8 +27,8 @@ type BaseSlideObject = {
     id: string,
     x: number,
     y: number,
-    width: number,
-    height: number,
+    width?: number,
+    height?: number,
 }
 
 type TextObjectType = BaseSlideObject & {

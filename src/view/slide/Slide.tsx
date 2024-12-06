@@ -50,7 +50,7 @@ function Slide({ slide, scale = 1, isSelected, className, selectedObjectId }: Sl
 				  switch (slideObject.type) {
 						case "text":
 							 return <div key={slideObject.id} onClick={() => onObjectClick(slideObject.id)}>
-							 				<TextObject textObject={slideObject} scale={scale} isSelected={slideObject.id == selectedObjectId}></TextObject>
+							 				<TextObject  textObject={slideObject} scale={scale} isSelected={slideObject.id == selectedObjectId}></TextObject>
 									  </div>
 						case "image":
 							 return <div key={slideObject.id} onClick={() => onObjectClick(slideObject.id)}>

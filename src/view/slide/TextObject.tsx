@@ -20,9 +20,11 @@ function TextObject({textObject, scale = 1, isSelected}: TextObjectProps) {
   }
 
     return (
-        <p  style={textObjectStyles}>{textObject.text} </p>
+        <p style={textObjectStyles}>{textObject.text} </p>
     )
 }
+
+
 
 export {
     TextObject,

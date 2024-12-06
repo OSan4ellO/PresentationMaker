@@ -1,6 +1,6 @@
 import { EditorType } from "./EditorType";
 
-// Обновленный обработчик смены фона
+
 function changeBackgroundImage(editor: EditorType, base64Image: string): EditorType {
     if (!base64Image || !editor.selection || !editor.selection.selectedSlideId) {
         return editor;
