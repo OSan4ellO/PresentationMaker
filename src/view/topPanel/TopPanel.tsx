@@ -8,7 +8,7 @@ import { addSlide } from '../../store/addSlide.ts';
 import { addTextElement } from '../../store/addTextElement.ts';
 import { addPhotoElement } from '../../store/addPhotoElement.ts';
 import { changeBackgroundColor } from '../../store/changeBackgroundColor.ts';
-import { changeBackgroundImage } from '../../store/changeBackgroundImage.ts';
+// import { changeBackgroundImage } from '../../store/changeBackgroundImage.ts';
 import { deleteElement } from '../../store/deleteElement.ts';
 import { deleteBackground } from '../../store/deleteBackground.ts';
 import { handleFileUpload } from '../../store/imageConverter.ts';
@@ -20,7 +20,8 @@ type TopPanelProps = {
 function TopPanel({ title }: TopPanelProps) {
     const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
     const [color, setColor] = useState("#561ecb");  // Цвет по умолчанию
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef1 = useRef<HTMLInputElement>(null);
+	 const fileInputRef2 = useRef<HTMLInputElement>(null);
 
     function onAddSlide() {
         dispatch(addSlide);
@@ -30,9 +31,13 @@ function TopPanel({ title }: TopPanelProps) {
         dispatch(removeSlide);
     }
 
-    function onAddPhotoElement() {
-        dispatch(addPhotoElement);
-    }
+	 function onAddPhotoElement(event: React.ChangeEvent<HTMLInputElement>){
+		const file = event.target.files?.[0]; 
+		if (file) {
+			 const fileURL = URL.createObjectURL(file); 
+			 dispatch(addPhotoElement, fileURL); 
+		}
+  }
 
     function onAddTextElement() {
         dispatch(addTextElement);
@@ -65,12 +70,20 @@ function TopPanel({ title }: TopPanelProps) {
                 onBlur={onTitleChange}
             />
             <input
-                ref={fileInputRef} 
+                ref={fileInputRef1} 
                 id="fileInput"
                 type="file"
                 accept="image/*"
                 style={{ display: "none" }}
                 onChange={handleFileUpload}
+            />
+				<input
+                ref={fileInputRef2} 
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={onAddPhotoElement}
             />
             <div className={styles.slideButtonBar}>
                 <Button className={styles.button} text="Add slide" onClick={onAddSlide} />
@@ -78,7 +91,7 @@ function TopPanel({ title }: TopPanelProps) {
             </div>
             <div className={styles.toolBar}>
                 <Button className={styles.button} text="Add text" onClick={onAddTextElement} />
-                <Button className={styles.button} text="Add image" onClick={() => fileInputRef.current?.click()} />
+                <Button className={styles.button} text="Add image" onClick={() => fileInputRef2.current?.click()} />
                 <Button className={styles.button} text="Delete element" onClick={onDeleteElement} />
                 <Button
                     className={styles.button}
@@ -101,7 +114,7 @@ function TopPanel({ title }: TopPanelProps) {
                     <Button
                         className={`${styles.button} ${styles.applyButton}`}
                         text="Change background image"
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => fileInputRef1.current?.click()}
                     />
                     <Button
                         className={`${styles.button} ${styles.applyButton}`}

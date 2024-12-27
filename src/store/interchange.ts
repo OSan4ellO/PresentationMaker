@@ -1,6 +1,6 @@
 import { EditorType } from "./EditorType";
 
-function Swap(editor: EditorType, payload: {draggedSlideId: string, targetSlideId: string}) {
+function interchange(editor: EditorType, payload: {draggedSlideId: string, targetSlideId: string}) {
     const { draggedSlideId, targetSlideId } = payload;
 
     const slides = [...editor.presentation.slides]; 
@@ -22,4 +22,4 @@ function Swap(editor: EditorType, payload: {draggedSlideId: string, targetSlideI
     return editor;
 }
 
-export {Swap};
+export {interchange};

@@ -5,7 +5,7 @@ import styles from './Slide.module.css'
 import {CSSProperties} from "react";
 import { setSelection } from "../../store/setSelection.ts";
 import { dispatch } from "../../store/editor.ts";
-import { editor } from "../../store/data.ts";
+// import { editor } from "../../store/data.ts";
 
 const SLIDE_WIDTH = 935
 const SLIDE_HEIGHT = 525

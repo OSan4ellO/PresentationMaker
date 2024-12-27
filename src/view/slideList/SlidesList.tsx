@@ -5,7 +5,7 @@ import { SelectionType } from "../../store/EditorType.ts";
 import { dispatch } from "../../store/editor.ts";
 import { setSelection } from "../../store/setSelection.ts";
 import { useState } from "react";
-import { Swap } from "../../store/swap.ts";
+import { interchange } from "../../store/interchange.ts";
 
 const SLIDE_PREVIEW_SCALE = 0.2;
 
@@ -19,15 +19,15 @@ function SlidesList({slides, selection }: SlidesListPros) {
     
 	const [draggedSlideId, setdraggedSlide] = useState<string | null>(null);
 
-	const handleDragStart = (e: React.DragEvent, slideId: string) => {
+	const handleDragStart = (_e: React.DragEvent, slideId: string) => {
 		 setdraggedSlide(slideId);
-		 e.dataTransfer.setData("slideId: ", slideId);
 	} 
 
 	const handeDrop = (e: React.DragEvent, targetSlideId: string) => {
 		 e.preventDefault();
-		 if(draggedSlideId && draggedSlideId != targetSlideId){
-			  dispatch(Swap, {draggedSlideId,targetSlideId});
+		
+		 if(draggedSlideId && draggedSlideId !== targetSlideId){
+			  dispatch(interchange, {draggedSlideId,targetSlideId});
 			  setdraggedSlide(null);
 		 }
 	}
@@ -37,6 +37,7 @@ function SlidesList({slides, selection }: SlidesListPros) {
 	function onSlideClick(slideId: string) {
 		 dispatch(setSelection, {selectedSlideId: slideId})
 	}
+	
 	return (
 		 <div className={styles.slideList}>
 			  {slides.map(slide =>
@@ -46,7 +47,7 @@ function SlidesList({slides, selection }: SlidesListPros) {
 							  draggable
 							  onDragStart={(e) => handleDragStart(e, slide.id)}
 							  onDrop={(e) => handeDrop(e, slide.id)}
-							  onDragOver={e => handleDragOver(e)}
+							  onDragOver={(e) => handleDragOver(e)}
 						 >
 							  <Slide
 									slide={slide}
