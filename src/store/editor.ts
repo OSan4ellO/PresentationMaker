@@ -3,12 +3,16 @@ import {editor} from './data.ts'
 let _editor = editor
 let _handler = null
 
+const LOCAL_STORAGE_KEY = 'presentation_editor_state';
+
 function getEditor() {
     return _editor
 }
 
 function setEditor(newEditor) {
     _editor = newEditor
+    // Сохраняем состояние в localStorage при каждом изменении
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newEditor));
 }
 
 function dispatch(modifyFn: Function, payload?: Object): void {
@@ -23,6 +27,17 @@ function dispatch(modifyFn: Function, payload?: Object): void {
 function addEditorChangeHandler(handler: Function): void {
     _handler = handler
 }
+
+// Функция для загрузки состояния из localStorage
+function loadFromLocalStorage() {
+    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedState) {
+        _editor = JSON.parse(savedState);
+    }
+}
+
+// Загружаем состояние из localStorage при старте
+loadFromLocalStorage();
 
 export {
     getEditor,

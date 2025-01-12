@@ -1,4 +1,4 @@
-import { changeBackgroundImage } from "./changeBackgroundImage";
+import { addPhotoElement } from "./addPhotoElement";
 import { dispatch } from "./editor";
 
 const convertFileToBase64 = (file: File): Promise<string> => {
@@ -10,12 +10,12 @@ const convertFileToBase64 = (file: File): Promise<string> => {
 	});
 };
 
-async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+async function handleImageObjUpload(event: React.ChangeEvent<HTMLInputElement>) {
 	if (event.target.files && event.target.files[0]) {
 		 const file = event.target.files[0];
 		 try {
 			  const base64Image = await convertFileToBase64(file);
-			  dispatch(changeBackgroundImage, base64Image);  
+			  dispatch(addPhotoElement, base64Image);  
 		 } catch (error) {
 			  console.error("Error converting file:", error);
 		 }
@@ -23,5 +23,5 @@ async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
 }
  
  export {
-	handleFileUpload
+	handleImageObjUpload
  }

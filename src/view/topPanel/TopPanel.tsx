@@ -6,12 +6,11 @@ import { removeSlide } from "../../store/removeSlide.ts";
 import { onTitleChange } from "../../store/renamePresentationTitle.ts";
 import { addSlide } from '../../store/addSlide.ts';
 import { addTextElement } from '../../store/addTextElement.ts';
-import { addPhotoElement } from '../../store/addPhotoElement.ts';
 import { changeBackgroundColor } from '../../store/changeBackgroundColor.ts';
-// import { changeBackgroundImage } from '../../store/changeBackgroundImage.ts';
 import { deleteElement } from '../../store/deleteElement.ts';
 import { deleteBackground } from '../../store/deleteBackground.ts';
-import { handleFileUpload } from '../../store/imageConverter.ts';
+import { handleBackgorundUpload } from '../../store/backgroundImageTo64.ts';
+import { handleImageObjUpload } from '../../store/imageObjTo64.ts';
 
 type TopPanelProps = {
     title: string,
@@ -30,14 +29,6 @@ function TopPanel({ title }: TopPanelProps) {
     function onRemoveSlide() {
         dispatch(removeSlide);
     }
-
-	 function onAddPhotoElement(event: React.ChangeEvent<HTMLInputElement>){
-		const file = event.target.files?.[0]; 
-		if (file) {
-			 const fileURL = URL.createObjectURL(file); 
-			 dispatch(addPhotoElement, fileURL); 
-		}
-  }
 
     function onAddTextElement() {
         dispatch(addTextElement);
@@ -75,7 +66,7 @@ function TopPanel({ title }: TopPanelProps) {
                 type="file"
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={handleFileUpload}
+                onChange={handleBackgorundUpload}
             />
 				<input
                 ref={fileInputRef2} 
@@ -83,7 +74,7 @@ function TopPanel({ title }: TopPanelProps) {
                 type="file"
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={onAddPhotoElement}
+                onChange={handleImageObjUpload}
             />
             <div className={styles.slideButtonBar}>
                 <Button className={styles.button} text="Add slide" onClick={onAddSlide} />
