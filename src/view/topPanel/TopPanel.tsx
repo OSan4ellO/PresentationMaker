@@ -11,6 +11,7 @@ import { deleteElement } from '../../store/deleteElement.ts';
 import { deleteBackground } from '../../store/deleteBackground.ts';
 import { handleBackgorundUpload } from '../../store/backgroundImageTo64.ts';
 import { handleImageObjUpload } from '../../store/imageObjTo64.ts';
+import { exportToJSON, importFromJSON } from '../../store/importExport.ts'; // Импортируем функции из importExport.ts
 
 type TopPanelProps = {
     title: string,
@@ -20,7 +21,8 @@ function TopPanel({ title }: TopPanelProps) {
     const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
     const [color, setColor] = useState("#561ecb");  // Цвет по умолчанию
     const fileInputRef1 = useRef<HTMLInputElement>(null);
-	 const fileInputRef2 = useRef<HTMLInputElement>(null);
+    const fileInputRef2 = useRef<HTMLInputElement>(null);
+    const importFileInputRef = useRef<HTMLInputElement>(null); // Ref для импорта
 
     function onAddSlide() {
         dispatch(addSlide);
@@ -56,7 +58,7 @@ function TopPanel({ title }: TopPanelProps) {
             <input
                 className={styles.title}
                 type="text"
-					 maxLength = {25}
+                maxLength={25}
                 defaultValue={title}
                 onBlur={onTitleChange}
             />
@@ -68,13 +70,20 @@ function TopPanel({ title }: TopPanelProps) {
                 style={{ display: "none" }}
                 onChange={handleBackgorundUpload}
             />
-				<input
+            <input
                 ref={fileInputRef2} 
                 id="fileInput"
                 type="file"
                 accept="image/*"
                 style={{ display: "none" }}
                 onChange={handleImageObjUpload}
+            />
+            <input
+                ref={importFileInputRef}
+                type="file"
+                accept=".json"
+                style={{ display: "none" }}
+                onChange={importFromJSON} // Используем функцию importFromJSON
             />
             <div className={styles.slideButtonBar}>
                 <Button className={styles.button} text="Add slide" onClick={onAddSlide} />
@@ -114,6 +123,11 @@ function TopPanel({ title }: TopPanelProps) {
                     />
                 </div>
             )}
+            {/* Новые кнопки для импорта и экспорта */}
+            <div className={styles.importExportBar}>
+                <Button className={styles.button} text="Export" onClick={exportToJSON} /> {/* Используем функцию exportToJSON */}
+                <Button className={styles.button} text="Import" onClick={() => importFileInputRef.current?.click()} />
+            </div>
         </div>
     );
 }

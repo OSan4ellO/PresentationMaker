@@ -40,6 +40,7 @@ function loadFromLocalStorage() {
 loadFromLocalStorage();
 
 export {
+	setEditor,
     getEditor,
     dispatch,
     addEditorChangeHandler,
