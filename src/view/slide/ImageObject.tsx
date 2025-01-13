@@ -1,18 +1,23 @@
 import { ImageObjectType } from "../../store/PresentationType.ts";
 import { CSSProperties } from "react";
-import useDrag from "./useDrag.ts";
+import useDrag from "./useDrag";
 
 type ImageObjectProps = {
   imageObject: ImageObjectType;
   scale?: number;
   isSelected: boolean;
   onPositionChange: (newPosition: { x: number; y: number }) => void;
+  slideWidth: number; // Ширина слайда
+  slideHeight: number; // Высота слайда
 };
 
-function ImageObject({ imageObject, scale = 1, isSelected, onPositionChange }: ImageObjectProps) {
+function ImageObject({ imageObject, scale = 1, isSelected, onPositionChange, slideWidth, slideHeight }: ImageObjectProps) {
   const { position, startDragging } = useDrag(
-    { x: imageObject.x, y: imageObject.y },
-    onPositionChange
+    { x: imageObject.x, y: imageObject.y, width: imageObject.width, height: imageObject.height },
+    onPositionChange,
+    slideWidth,
+    slideHeight,
+    scale // Передаем масштаб
   );
 
   const imageObjectStyles: CSSProperties = {
@@ -28,7 +33,6 @@ function ImageObject({ imageObject, scale = 1, isSelected, onPositionChange }: I
     imageObjectStyles.border = '3px solid #8a2094';
   }
 
-  // Обработчик для отключения стандартного поведения перетаскивания
   const handleDragStart = (e: React.DragEvent<HTMLImageElement>) => {
     e.preventDefault();
   };
@@ -38,7 +42,7 @@ function ImageObject({ imageObject, scale = 1, isSelected, onPositionChange }: I
       style={imageObjectStyles}
       src={imageObject.src}
       onMouseDown={startDragging}
-      onDragStart={handleDragStart} // Отключаем стандартное поведение
+      onDragStart={handleDragStart}
       alt="object"
     />
   );

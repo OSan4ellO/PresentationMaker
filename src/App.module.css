@@ -14,3 +14,8 @@
   display: flex;
   height: calc(100vh - var(--topPanelHeight) - 20px);
 }
+
+p {
+  margin: 0;
+  padding: 0;
+}

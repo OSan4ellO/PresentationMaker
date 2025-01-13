@@ -4,7 +4,9 @@ function useDrag(
   initialPosition: { x: number; y: number; width?: number; height?: number },
   onDragEnd?: (newPosition: { x: number; y: number }) => void,
   slideWidth: number = 935, // Ширина слайда по умолчанию
-  slideHeight: number = 525 // Высота слайда по умолчанию
+  slideHeight: number = 525, // Высота слайда по умолчанию
+  scale: number = 1, // Масштаб объекта
+  getActualSize?: () => { width: number; height: number } // Функция для получения фактических размеров
 ) {
   const [position, setPosition] = useState(initialPosition);
   const [isDragging, setIsDragging] = useState(false);
@@ -27,15 +29,13 @@ function useDrag(
         let newX = elementStartPos.current.x + dx;
         let newY = elementStartPos.current.y + dy;
 
+        // Получаем фактические размеры объекта
+        const actualWidth = getActualSize ? getActualSize().width : (initialPosition.width || 0) * scale;
+        const actualHeight = getActualSize ? getActualSize().height : (initialPosition.height || 0) * scale;
+
         // Ограничиваем координаты границами слайда
-        const objectWidth = initialPosition.width || 0;
-        const objectHeight = initialPosition.height || 0;
-
-        // Правая граница: x + width <= slideWidth
-        newX = Math.max(0, Math.min(newX, slideWidth - objectWidth));
-
-        // Нижняя граница: y + height <= slideHeight
-        newY = Math.max(0, Math.min(newY, slideHeight - objectHeight));
+        newX = Math.max(0, Math.min(newX, slideWidth - actualWidth));
+        newY = Math.max(0, Math.min(newY, slideHeight - actualHeight));
 
         setPosition({ x: newX, y: newY });
       }
@@ -57,7 +57,7 @@ function useDrag(
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, position, onDragEnd, slideWidth, slideHeight, initialPosition.width, initialPosition.height]);
+  }, [isDragging, position, onDragEnd, slideWidth, slideHeight, initialPosition.width, initialPosition.height, scale, getActualSize]);
 
   return { position, startDragging };
 }

@@ -1,19 +1,35 @@
-// TextObject.tsx
 import { TextObjectType } from "../../store/PresentationType.ts";
-import { CSSProperties } from "react";
-import useDrag from "./useDrag"; // Импортируем useDrag как default
+import { CSSProperties, useRef } from "react";
+import useDrag from "./useDrag";
 
 type TextObjectProps = {
   textObject: TextObjectType;
   scale?: number;
   isSelected: boolean;
   onPositionChange: (newPosition: { x: number; y: number }) => void;
+  slideWidth: number; // Ширина слайда
+  slideHeight: number; // Высота слайда
 };
 
-function TextObject({ textObject, scale = 1, isSelected, onPositionChange }: TextObjectProps) {
+function TextObject({ textObject, scale = 1, isSelected, onPositionChange, slideWidth, slideHeight }: TextObjectProps) {
+  const textRef = useRef<HTMLParagraphElement>(null);
+
+  // Функция для получения фактических размеров текста
+  const getActualSize = () => {
+    if (textRef.current) {
+      const rect = textRef.current.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    }
+    return { width: textObject.width * scale, height: textObject.height * scale };
+  };
+
   const { position, startDragging } = useDrag(
-    { x: textObject.x, y: textObject.y },
-    onPositionChange
+    { x: textObject.x, y: textObject.y, width: textObject.width, height: textObject.height },
+    onPositionChange,
+    slideWidth,
+    slideHeight,
+    scale,
+    getActualSize // Передаем функцию для получения фактических размеров
   );
 
   const textObjectStyles: CSSProperties = {
@@ -31,7 +47,7 @@ function TextObject({ textObject, scale = 1, isSelected, onPositionChange }: Tex
   }
 
   return (
-    <p style={textObjectStyles} onMouseDown={startDragging}>
+    <p ref={textRef} style={textObjectStyles} onMouseDown={startDragging}>
       {textObject.text}
     </p>
   );
