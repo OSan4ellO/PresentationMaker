@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 function useDrag(
-  initialPosition: { x: number; y: number },
+  initialPosition: { x: number; y: number; width?: number; height?: number },
   onDragEnd?: (newPosition: { x: number; y: number }) => void,
   slideWidth: number = 935, // Ширина слайда по умолчанию
   slideHeight: number = 525 // Высота слайда по умолчанию
@@ -28,8 +28,14 @@ function useDrag(
         let newY = elementStartPos.current.y + dy;
 
         // Ограничиваем координаты границами слайда
-        newX = Math.max(0, Math.min(newX, slideWidth - (initialPosition.width || 0)));
-        newY = Math.max(0, Math.min(newY, slideHeight - (initialPosition.height || 0)));
+        const objectWidth = initialPosition.width || 0;
+        const objectHeight = initialPosition.height || 0;
+
+        // Правая граница: x + width <= slideWidth
+        newX = Math.max(0, Math.min(newX, slideWidth - objectWidth));
+
+        // Нижняя граница: y + height <= slideHeight
+        newY = Math.max(0, Math.min(newY, slideHeight - objectHeight));
 
         setPosition({ x: newX, y: newY });
       }
