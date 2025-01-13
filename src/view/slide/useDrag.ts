@@ -1,9 +1,10 @@
-// useDrag.ts
 import { useState, useRef, useEffect } from 'react';
 
 function useDrag(
   initialPosition: { x: number; y: number },
-  onDragEnd?: (newPosition: { x: number; y: number }) => void
+  onDragEnd?: (newPosition: { x: number; y: number }) => void,
+  slideWidth: number = 935, // Ширина слайда по умолчанию
+  slideHeight: number = 525 // Высота слайда по умолчанию
 ) {
   const [position, setPosition] = useState(initialPosition);
   const [isDragging, setIsDragging] = useState(false);
@@ -21,8 +22,15 @@ function useDrag(
       if (isDragging) {
         const dx = e.clientX - dragStartPos.current.x;
         const dy = e.clientY - dragStartPos.current.y;
-        const newX = elementStartPos.current.x + dx;
-        const newY = elementStartPos.current.y + dy;
+
+        // Новые координаты объекта
+        let newX = elementStartPos.current.x + dx;
+        let newY = elementStartPos.current.y + dy;
+
+        // Ограничиваем координаты границами слайда
+        newX = Math.max(0, Math.min(newX, slideWidth - (initialPosition.width || 0)));
+        newY = Math.max(0, Math.min(newY, slideHeight - (initialPosition.height || 0)));
+
         setPosition({ x: newX, y: newY });
       }
     };
@@ -43,10 +51,9 @@ function useDrag(
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, position, onDragEnd]);
+  }, [isDragging, position, onDragEnd, slideWidth, slideHeight, initialPosition.width, initialPosition.height]);
 
   return { position, startDragging };
 }
 
-// Экспортируем useDrag как default
 export default useDrag;
