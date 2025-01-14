@@ -12,6 +12,7 @@ import {
 	HANDLE_IMAGE_OBJ_UPLOAD,
 	RENAME_PRESENTATION_TITLE,
 	INTERCHANGE_SLIDES,
+	UPDATE_OBJECT_SIZE,
 	
 } from './actions';
 import { EditorType } from '../store/EditorType';
@@ -125,6 +126,35 @@ function editorReducer(state: EditorType = initialState, action: any): EditorTyp
                     selectedObjectId: null,
                 },
             };
+				case UPDATE_OBJECT_SIZE: {
+					const { slideId, objectId, newSize, newPosition } = action.payload;
+					return {
+						 ...state,
+						 presentation: {
+							  ...state.presentation,
+							  slides: state.presentation.slides.map((slide) => {
+									if (slide.id === slideId) {
+										 return {
+											  ...slide,
+											  objects: slide.objects.map((obj) => {
+													if (obj.id === objectId) {
+														 return {
+															  ...obj,
+															  width: newSize.width,
+															  height: newSize.height,
+															  x: newPosition.x,
+															  y: newPosition.y,
+														 };
+													}
+													return obj;
+											  }),
+										 };
+									}
+									return slide;
+							  }),
+						 },
+					};
+			  }
 
 		 default:
 			  return state;

@@ -13,6 +13,7 @@ export const RENAME_PRESENTATION_TITLE = 'RENAME_PRESENTATION_TITLE';
 export const EXPORT_TO_JSON = 'EXPORT_TO_JSON';
 export const IMPORT_FROM_JSON = 'IMPORT_FROM_JSON';
 export const UPDATE_OBJECT_POSITION = 'UPDATE_OBJECT_POSITION';
+export const UPDATE_OBJECT_SIZE = 'UPDATE_OBJECT_SIZE';
 
 export const addSlide = () => ({
     type: ADD_SLIDE,
@@ -80,4 +81,14 @@ export const updateObjectPosition = (payload: {
 }) => ({
     type: UPDATE_OBJECT_POSITION,
     payload,
+});
+
+export const updateObjectSize = (payload: {
+	slideId: string;
+	objectId: string;
+	newSize: { width: number; height: number };
+	newPosition: { x: number; y: number };
+}) => ({
+	type: UPDATE_OBJECT_SIZE,
+	payload,
 });
