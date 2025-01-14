@@ -5,7 +5,7 @@ import { useAppSelector } from '../../redux/hooks';
 
 function Workspace() {
     const selectedSlideId = useAppSelector((state) => state.editor.selection.selectedSlideId);
-    const selectedObjectId = useAppSelector((state) => state.editor.selection.selectedObjectId); // Получаем selectedObjectId
+    const selectedObjectId = useAppSelector((state) => state.editor.selection.selectedObjectId);
     const slides = useAppSelector((state) => state.editor.presentation.slides);
     const displayedSlide = slides.find((slide) => slide.id === selectedSlideId);
 
@@ -16,8 +16,8 @@ function Workspace() {
     return (
         <div className={styles.workspace}>
             <Slide
-                slide={displayedSlide}
-                isSelected={true} // Слайд выделен
+                slide={displayedSlide} // Передаем обновленный слайд
+                isSelected={false} // Слайд не выделяется в Workspace
                 className={""}
                 selectedObjectId={selectedObjectId} // Передаем selectedObjectId
             />
