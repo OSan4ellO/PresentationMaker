@@ -3,10 +3,10 @@ import { TextObjectType } from "../../store/PresentationType.ts";
 import { CSSProperties, useState } from "react";
 import { useAppDispatch } from '../../redux/hooks';
 import useDrag from "./useDrag";
-import { updateObjectPosition } from '../../redux/actions.ts';
+import { updateObjectPosition, setSelection } from '../../redux/actions.ts';
 
 type TextObjectProps = {
-    textObject: TextObjectType & { slideId: string }; 
+    textObject: TextObjectType & { slideId: string }; // Добавляем slideId
     scale?: number;
     isSelected: boolean;
 };
@@ -20,7 +20,7 @@ function TextObject({ textObject, scale = 1, isSelected }: TextObjectProps) {
     const onDragEnd = (newPosition: { x: number; y: number }) => {
         dispatch(
             updateObjectPosition({
-                slideId: textObject.slideId, 
+                slideId: textObject.slideId,
                 objectId: textObject.id,
                 newPosition,
             })
@@ -36,6 +36,16 @@ function TextObject({ textObject, scale = 1, isSelected }: TextObjectProps) {
         scale
     );
 
+    // Обработчик клика для выделения объекта
+    const handleClick = () => {
+        dispatch(
+            setSelection({
+                selectedSlideId: textObject.slideId,
+                selectedObjectId: textObject.id,
+            })
+        );
+    };
+
     // Стили для текстового объекта
     const textObjectStyles: CSSProperties = {
         position: 'absolute',
@@ -46,44 +56,19 @@ function TextObject({ textObject, scale = 1, isSelected }: TextObjectProps) {
         fontSize: `${textObject.fontSize * scale}px`,
         margin: '0',
         cursor: isSelected ? 'move' : 'default',
-        border: isSelected ? '2px solid #0b57d0' : 'none',
-    };
-
-    const handleDoubleClick = () => {
-        setIsEditing(true);
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTextValue(e.target.value);
-    };
-
-    const handleBlur = () => {
-        setIsEditing(false);
-		  localStorage.setItem(`text_${textObject.id}`, textValue);
+        border: isSelected ? '2px solid #0b57d0' : 'none', // Стиль для выделенного объекта
     };
 
     return (
-        <>
-            {isEditing ? (
-                <input
-                    type="text"
-                    value={textValue}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    autoFocus
-                    style={{ ...textObjectStyles, fontSize: `${textObject.fontSize * scale}px` }}
-                />
-            ) : (
-                // Отображение текста
-                <p
-                    onDoubleClick={handleDoubleClick}
-                    onMouseDown={startDragging}
-                    style={textObjectStyles}
-                >
-                    {textValue}
-                </p>
-            )}
-        </>
+        <p
+            onMouseDown={(e) => {
+                handleClick(); // Выделяем объект
+                startDragging(e); // Начинаем перетаскивание
+            }}
+            style={textObjectStyles}
+        >
+            {textValue}
+        </p>
     );
 }
 

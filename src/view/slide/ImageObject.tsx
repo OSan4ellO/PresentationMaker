@@ -3,7 +3,7 @@ import { CSSProperties } from "react";
 import { useAppDispatch } from '../../redux/hooks';
 import { ImageObjectType } from "../../store/PresentationType.ts";
 import useDrag from "./useDrag";
-import { updateObjectPosition } from '../../redux/actions.ts';
+import { updateObjectPosition, setSelection } from '../../redux/actions.ts';
 
 type ImageObjectProps = {
     imageObject: ImageObjectType & { slideId: string }; // Добавляем slideId
@@ -16,10 +16,9 @@ function ImageObject({ imageObject, scale = 1, isSelected }: ImageObjectProps) {
 
     // Обработчик изменения позиции изображения
     const onDragEnd = (newPosition: { x: number; y: number }) => {
-        console.log('ImageObject onDragEnd:', imageObject.slideId, newPosition); // Логируем slideId и координаты
         dispatch(
             updateObjectPosition({
-                slideId: imageObject.slideId, // Используем slideId из imageObject
+                slideId: imageObject.slideId,
                 objectId: imageObject.id,
                 newPosition,
             })
@@ -35,6 +34,16 @@ function ImageObject({ imageObject, scale = 1, isSelected }: ImageObjectProps) {
         scale
     );
 
+    // Обработчик клика для выделения объекта
+    const handleClick = () => {
+        dispatch(
+            setSelection({
+                selectedSlideId: imageObject.slideId,
+                selectedObjectId: imageObject.id,
+            })
+        );
+    };
+
     // Стили для изображения
     const imageObjectStyles: CSSProperties = {
         position: 'absolute',
@@ -43,22 +52,17 @@ function ImageObject({ imageObject, scale = 1, isSelected }: ImageObjectProps) {
         width: `${imageObject.width * scale}px`,
         height: `${imageObject.height * scale}px`,
         cursor: isSelected ? 'move' : 'default',
-    };
-
-    if (isSelected) {
-        imageObjectStyles.border = '3px solid #8a2094';
-    }
-
-    const handleDragStart = (e: React.DragEvent<HTMLImageElement>) => {
-        e.preventDefault();
+        border: isSelected ? '3px solid #8a2094' : 'none', // Стиль для выделенного объекта
     };
 
     return (
         <img
             style={imageObjectStyles}
             src={imageObject.src}
-            onMouseDown={startDragging}
-            onDragStart={handleDragStart}
+            onMouseDown={(e) => {
+                handleClick(); // Выделяем объект
+                startDragging(e); // Начинаем перетаскивание
+            }}
             alt="object"
         />
     );

@@ -1,3 +1,4 @@
+// components/Slide.tsx
 import { TextObject } from "./TextObject.tsx";
 import { ImageObject } from "./ImageObject.tsx";
 import styles from './Slide.module.css';
@@ -14,7 +15,7 @@ type SlideProps = {
     scale?: number;
     isSelected: boolean;
     className: string;
-    selectedObjectId: string | null;
+    selectedObjectId: string | null; // selectedObjectId передается сюда
 };
 
 function Slide({ slide, scale = 1, isSelected, className, selectedObjectId }: SlideProps) {
@@ -36,7 +37,7 @@ function Slide({ slide, scale = 1, isSelected, className, selectedObjectId }: Sl
                                 key={slideObject.id}
                                 textObject={{ ...slideObject, slideId: slide.id }} // Передаем slideId
                                 scale={scale}
-                                isSelected={slideObject.id === selectedObjectId}
+                                isSelected={slideObject.id === selectedObjectId} // Передаем isSelected
                             />
                         );
                     case "image":
@@ -45,7 +46,7 @@ function Slide({ slide, scale = 1, isSelected, className, selectedObjectId }: Sl
                                 key={slideObject.id}
                                 imageObject={{ ...slideObject, slideId: slide.id }} // Передаем slideId
                                 scale={scale}
-                                isSelected={slideObject.id === selectedObjectId}
+                                isSelected={slideObject.id === selectedObjectId} // Передаем isSelected
                             />
                         );
                     default:

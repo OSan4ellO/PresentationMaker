@@ -56,8 +56,14 @@ function editorReducer(state: EditorType = initialState, action: any): EditorTyp
 		 case REMOVE_SLIDE:
 			  return removeSlide(state);
 
-		 case SET_SELECTION:
-			  return setSelection(state, action.payload);
+			  case SET_SELECTION:
+            return {
+                ...state,
+                selection: {
+                    selectedSlideId: action.payload.selectedSlideId,
+                    selectedObjectId: action.payload.selectedObjectId,
+                },
+            };
 
 		 case RENAME_PRESENTATION_TITLE:
 			  return renamePresentationTitle(state, action.payload);

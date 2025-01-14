@@ -1,6 +1,4 @@
-import { EditorType } from "../store/EditorType";
 
-// store/actions.ts
 export const ADD_SLIDE = 'ADD_SLIDE';
 export const REMOVE_SLIDE = 'REMOVE_SLIDE';
 export const SET_SELECTION = 'SET_SELECTION';
@@ -25,8 +23,8 @@ export const removeSlide = (slideId: string) => ({
 });
 
 export const setSelection = (payload: { selectedSlideId: string; selectedObjectId: string | null }) => ({
-    type: SET_SELECTION,
-    payload,
+	type: SET_SELECTION,
+	payload,
 });
 
 export const interchangeSlides = (payload: { draggedSlideId: string; targetSlideId: string }) => ({
