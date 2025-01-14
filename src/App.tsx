@@ -1,28 +1,31 @@
-import styles from './App.module.css'
-import {SlidesList} from "./view/slideList/SlidesList.tsx";
-import {TopPanel} from "./view/topPanel/TopPanel.tsx";
-import {EditorType} from "./store/EditorType.ts";
+// App.tsx
+import styles from './App.module.css';
+import { SlidesList } from "./view/slideList/SlidesList.tsx";
+import { TopPanel } from "./view/topPanel/TopPanel.tsx";
 import { Workspace } from './view/workSpace/Workspace.tsx';
+import { useAppSelector } from './redux/hooks.ts';
 
+function App() {
+    const presentation = useAppSelector((state) => state.editor.presentation);
+    const selection = useAppSelector((state) => state.editor.selection);
 
-type AppProps = {
-    editor: EditorType,
-}
-function App({editor}: AppProps) { // получение актуальной модели редактора //
-	if (!editor.selection) {
-		return editor
-  }
-  const displayedSlideId = editor.selection.selectedSlideId
-	const displayedSlideIndex = editor.presentation.slides.findIndex(slide => slide.id == displayedSlideId)
+    // Проверка на undefined
+    if (!presentation || !presentation.slides || !selection) {
+        return <div>Loading...</div>; 
+    }
+
+    const selectedSlideId = selection.selectedSlideId;
+    const displayedSlide = presentation.slides.find((slide) => slide.id === selectedSlideId);
+
     return (
         <>
-            <TopPanel title={editor.presentation.title}></TopPanel>
+            <TopPanel title={presentation.title} />
             <div className={styles.container}>
-                <SlidesList slides={editor.presentation.slides} selection={editor.selection}></SlidesList>
-                <Workspace slide={editor.presentation.slides[displayedSlideIndex]} selectedObjectId={editor.selection.selectedObjectId}></Workspace>
+                <SlidesList slides={presentation.slides} selectedSlideId={selectedSlideId} />
+                {displayedSlide && <Workspace slide={displayedSlide} />}
             </div>
         </>
-    )
+    );
 }
 
-export default App
+export default App;

@@ -1,5 +1,5 @@
+// store/changeBackgroundImage.ts
 import { EditorType } from "./EditorType";
-
 
 function changeBackgroundImage(editor: EditorType, base64Image: string): EditorType {
     if (!base64Image || !editor.selection || !editor.selection.selectedSlideId) {
@@ -10,6 +10,10 @@ function changeBackgroundImage(editor: EditorType, base64Image: string): EditorT
     const changeableSlideIndex = editor.presentation.slides.findIndex(
         (slide) => slide.id === changeableSlideId
     );
+
+    if (changeableSlideIndex === -1) {
+        return editor;
+    }
 
     const newSlides = [...editor.presentation.slides];
     newSlides[changeableSlideIndex] = {

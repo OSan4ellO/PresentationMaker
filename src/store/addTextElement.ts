@@ -6,14 +6,12 @@ function addTextElement(editor: EditorType): EditorType {
     const newElemId = nanoid(8);
     const userText = prompt("Enter text to add to slide:");
     if (!userText) {
-        return editor;
+        return editor; // Если пользователь отменил ввод, возвращаем исходное состояние
     }
 
     if (!editor.selection || !editor.selection.selectedSlideId) {
-        return editor;
+        return editor; // Если слайд не выбран, ничего не делаем
     }
-
-	 console.log('editor', editor);
 
     const changeableSlideId = editor.selection.selectedSlideId;
     const changeableSlideIndex = editor.presentation.slides.findIndex(slide => slide.id === changeableSlideId);
@@ -22,8 +20,6 @@ function addTextElement(editor: EditorType): EditorType {
         id: newElemId,
         x: 0,
         y: 0,
-      //   width: 100,
-      //   height: 20,
         type: "text",
         text: userText,
         fontFamily: 'Roboto',
@@ -34,7 +30,7 @@ function addTextElement(editor: EditorType): EditorType {
     const newSlides = [...editor.presentation.slides];
     newSlides[changeableSlideIndex] = {
         ...newSlides[changeableSlideIndex],
-        objects: [...newSlides[changeableSlideIndex].objects, newObject], 
+        objects: [...newSlides[changeableSlideIndex].objects, newObject],
     };
 
     return {
@@ -44,7 +40,7 @@ function addTextElement(editor: EditorType): EditorType {
         },
         selection: {
             selectedSlideId: changeableSlideId,
-				selectedObjectId: editor.selection.selectedObjectId
+            selectedObjectId: newElemId, // Устанавливаем выбранным новый объект
         },
     };
 }

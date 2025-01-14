@@ -1,41 +1,33 @@
-
+// store/changeBackgroundColor.ts
 import { EditorType } from "./EditorType";
 
-function changeBackgroundColor(editor: EditorType, newBackground: string): EditorType{
-	
-	// const newBackground = prompt("Enter hex/rgba color code:");
-
-    if (!newBackground) {
+function changeBackgroundColor(editor: EditorType, newBackground: string): EditorType {
+    if (!newBackground || !editor.selection || !editor.selection.selectedSlideId) {
         return editor;
     }
-
-    if (!editor.selection || !editor.selection.selectedSlideId) {
-        return editor;
-    }
-
-	 console.log('editor', editor);
 
     const changeableSlideId = editor.selection.selectedSlideId;
-    const changeableSlideIndex = editor.presentation.slides.findIndex(slide => slide.id === changeableSlideId);
+    const changeableSlideIndex = editor.presentation.slides.findIndex(
+        (slide) => slide.id === changeableSlideId
+    );
 
-	const newSlides = [...editor.presentation.slides];
+    if (changeableSlideIndex === -1) {
+        return editor;
+    }
+
+    const newSlides = [...editor.presentation.slides];
     newSlides[changeableSlideIndex] = {
         ...newSlides[changeableSlideIndex],
-        background:{type: 'solid', color: `${newBackground}`} , 
+        background: { type: 'solid', color: newBackground },
     };
 
     return {
+        ...editor,
         presentation: {
             ...editor.presentation,
             slides: newSlides,
         },
-        selection: {
-            selectedSlideId: changeableSlideId,
-				selectedObjectId: editor.selection.selectedObjectId
-        },
     };
 }
 
-export{
-	changeBackgroundColor
-}
+export { changeBackgroundColor };

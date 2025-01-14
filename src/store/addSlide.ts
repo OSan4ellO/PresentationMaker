@@ -1,24 +1,9 @@
+// store/addSlide.ts
 import { EditorType } from "./EditorType.ts";
 import { SlideType } from "./PresentationType.ts";
 import { nanoid } from "nanoid";
 
 function addSlide(editor: EditorType): EditorType {
-    console.log("editor", editor);
-
-    if (!editor.selection || !editor.selection.selectedSlideId) {
-        return editor;
-    }
-
-    const selectedSlideId = editor.selection.selectedSlideId;
-
-    const selectedSlideIndex = editor.presentation.slides.findIndex(
-        (slide) => slide.id === selectedSlideId
-    );
-
-    if (selectedSlideIndex === -1) {
-        return editor;
-    }
-
     const newSlideId = nanoid(10);
 
     const newSlide: SlideType = {
@@ -26,7 +11,32 @@ function addSlide(editor: EditorType): EditorType {
         objects: [],
         background: { type: "solid", color: "#ffffff" },
     };
- 
+
+    // Если selectedSlideId не указан, добавляем слайд в конец списка
+    if (!editor.selection || !editor.selection.selectedSlideId) {
+        return {
+            ...editor,
+            presentation: {
+                ...editor.presentation,
+                slides: [...editor.presentation.slides, newSlide],
+            },
+            selection: {
+                selectedSlideId: newSlideId, // Выбираем новый слайд
+                selectedObjectId: null,
+            },
+        };
+    }
+
+    // Если selectedSlideId указан, добавляем слайд после выбранного
+    const selectedSlideId = editor.selection.selectedSlideId;
+    const selectedSlideIndex = editor.presentation.slides.findIndex(
+        (slide) => slide.id === selectedSlideId
+    );
+
+    if (selectedSlideIndex === -1) {
+        return editor; // Если выбранный слайд не найден, возвращаем исходное состояние
+    }
+
     const newSlides = [
         ...editor.presentation.slides.slice(0, selectedSlideIndex + 1),
         newSlide,
@@ -40,12 +50,10 @@ function addSlide(editor: EditorType): EditorType {
             slides: newSlides,
         },
         selection: {
-            selectedSlideId: newSlideId, 
-            selectedObjectId: editor.selection.selectedObjectId,
+            selectedSlideId: newSlideId, // Выбираем новый слайд
+            selectedObjectId: null,
         },
     };
 }
 
-export { 
-	addSlide 
-};
+export { addSlide };

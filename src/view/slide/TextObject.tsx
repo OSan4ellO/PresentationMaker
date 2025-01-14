@@ -1,56 +1,90 @@
+// components/TextObject.tsx
 import { TextObjectType } from "../../store/PresentationType.ts";
-import { CSSProperties, useRef } from "react";
+import { CSSProperties, useState } from "react";
+import { useAppDispatch } from '../../redux/hooks';
 import useDrag from "./useDrag";
+import { updateObjectPosition } from '../../redux/actions.ts';
 
 type TextObjectProps = {
-  textObject: TextObjectType;
-  scale?: number;
-  isSelected: boolean;
-  onPositionChange: (newPosition: { x: number; y: number }) => void;
-  slideWidth: number; // Ширина слайда
-  slideHeight: number; // Высота слайда
+    textObject: TextObjectType & { slideId: string }; 
+    scale?: number;
+    isSelected: boolean;
 };
 
-function TextObject({ textObject, scale = 1, isSelected, onPositionChange, slideWidth, slideHeight }: TextObjectProps) {
-  const textRef = useRef<HTMLParagraphElement>(null);
+function TextObject({ textObject, scale = 1, isSelected }: TextObjectProps) {
+    const dispatch = useAppDispatch();
+    const [isEditing, setIsEditing] = useState(false);
+    const [textValue, setTextValue] = useState(textObject.text);
 
-  // Функция для получения фактических размеров текста
-  const getActualSize = () => {
-    if (textRef.current) {
-      const rect = textRef.current.getBoundingClientRect();
-      return { width: rect.width, height: rect.height };
-    }
-    return { width: textObject.width * scale, height: textObject.height * scale };
-  };
+    // Обработчик изменения позиции текстового объекта
+    const onDragEnd = (newPosition: { x: number; y: number }) => {
+        dispatch(
+            updateObjectPosition({
+                slideId: textObject.slideId, 
+                objectId: textObject.id,
+                newPosition,
+            })
+        );
+    };
 
-  const { position, startDragging } = useDrag(
-    { x: textObject.x, y: textObject.y, width: textObject.width, height: textObject.height },
-    onPositionChange,
-    slideWidth,
-    slideHeight,
-    scale,
-    getActualSize // Передаем функцию для получения фактических размеров
-  );
+    // Используем хук useDrag для перетаскивания
+    const { position, startDragging } = useDrag(
+        { x: textObject.x, y: textObject.y, width: textObject.width, height: textObject.height },
+        onDragEnd,
+        935, // Ширина слайда
+        525, // Высота слайда
+        scale
+    );
 
-  const textObjectStyles: CSSProperties = {
-    position: 'absolute',
-    top: `${position.y * scale}px`,
-    left: `${position.x * scale}px`,
-    width: `${textObject.width * scale}px`,
-    height: `${textObject.height * scale}px`,
-    fontSize: `${textObject.fontSize * scale}px`,
-    cursor: isSelected ? 'move' : 'default',
-  };
+    // Стили для текстового объекта
+    const textObjectStyles: CSSProperties = {
+        position: 'absolute',
+        top: `${position.y * scale}px`,
+        left: `${position.x * scale}px`,
+        width: `${textObject.width * scale}px`,
+        height: `${textObject.height * scale}px`,
+        fontSize: `${textObject.fontSize * scale}px`,
+        margin: '0',
+        cursor: isSelected ? 'move' : 'default',
+        border: isSelected ? '2px solid #0b57d0' : 'none',
+    };
 
-  if (isSelected) {
-    textObjectStyles.border = '3px solid #8a2094';
-  }
+    const handleDoubleClick = () => {
+        setIsEditing(true);
+    };
 
-  return (
-    <p ref={textRef} style={textObjectStyles} onMouseDown={startDragging}>
-      {textObject.text}
-    </p>
-  );
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTextValue(e.target.value);
+    };
+
+    const handleBlur = () => {
+        setIsEditing(false);
+		  localStorage.setItem(`text_${textObject.id}`, textValue);
+    };
+
+    return (
+        <>
+            {isEditing ? (
+                <input
+                    type="text"
+                    value={textValue}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    autoFocus
+                    style={{ ...textObjectStyles, fontSize: `${textObject.fontSize * scale}px` }}
+                />
+            ) : (
+                // Отображение текста
+                <p
+                    onDoubleClick={handleDoubleClick}
+                    onMouseDown={startDragging}
+                    style={textObjectStyles}
+                >
+                    {textValue}
+                </p>
+            )}
+        </>
+    );
 }
 
 export { TextObject };

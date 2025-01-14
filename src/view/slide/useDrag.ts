@@ -3,10 +3,10 @@ import { useState, useRef, useEffect } from 'react';
 function useDrag(
   initialPosition: { x: number; y: number; width?: number; height?: number },
   onDragEnd?: (newPosition: { x: number; y: number }) => void,
-  slideWidth: number = 935, // Ширина слайда по умолчанию
-  slideHeight: number = 525, // Высота слайда по умолчанию
-  scale: number = 1, // Масштаб объекта
-  getActualSize?: () => { width: number; height: number } // Функция для получения фактических размеров
+  slideWidth: number = 935, 
+  slideHeight: number = 525, 
+  scale: number = 1, 
+  getActualSize?: () => { width: number; height: number } 
 ) {
   const [position, setPosition] = useState(initialPosition);
   const [isDragging, setIsDragging] = useState(false);

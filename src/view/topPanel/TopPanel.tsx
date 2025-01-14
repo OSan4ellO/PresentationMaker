@@ -1,57 +1,56 @@
+// components/TopPanel.tsx
 import styles from './TopPanel.module.css';
 import { useRef, useState } from 'react';
 import { Button } from "../../components/button/Button.tsx";
-import { dispatch } from "../../store/editor.ts";
-import { removeSlide } from "../../store/removeSlide.ts";
-import { onTitleChange } from "../../store/renamePresentationTitle.ts";
-import { addSlide } from '../../store/addSlide.ts';
-import { addTextElement } from '../../store/addTextElement.ts';
-import { changeBackgroundColor } from '../../store/changeBackgroundColor.ts';
-import { deleteElement } from '../../store/deleteElement.ts';
-import { deleteBackground } from '../../store/deleteBackground.ts';
-import { handleBackgorundUpload } from '../../store/backgroundImageTo64.ts';
-import { handleImageObjUpload } from '../../store/imageObjTo64.ts';
-import { exportToJSON, importFromJSON } from '../../store/importExport.ts';
+import { useAppDispatch } from '../../redux/hooks';
+import {
+    addSlide,
+    removeSlide,
+    addTextElement,
+    changeBackgroundColor,
+    deleteElement,
+    deleteBackground,
+    handleBackgroundUpload,
+    handleImageObjUpload,
+    renamePresentationTitle,
+    importFromJSON as importAction,
+} from '../../redux/actions.ts';
+import { exportToFile } from '../../store/export.ts';
+import { getEditor } from '../../store/editor.ts';
+import { importFromJSON } from '../../store/import.ts';
 
-type TopPanelProps = {
-    title: string,
-}
-
-function TopPanel({ title }: TopPanelProps) {
+function TopPanel({ title }: { title: string }) {
+    const dispatch = useAppDispatch();
     const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
-    const [color, setColor] = useState("#561ecb");  // Цвет по умолчанию
+    const [color, setColor] = useState("#561ecb");
     const fileInputRef1 = useRef<HTMLInputElement>(null);
     const fileInputRef2 = useRef<HTMLInputElement>(null);
-    const importFileInputRef = useRef<HTMLInputElement>(null); // Ref для импорта
+    const importFileInputRef = useRef<HTMLInputElement>(null);
 
-    function onAddSlide() {
-        dispatch(addSlide);
-    }
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, action: typeof handleBackgroundUpload | typeof handleImageObjUpload) => {
+        if (event.target.files && event.target.files[0]) {
+            dispatch(action({ file: event.target.files[0] }));
+        }
+    };
 
-    function onRemoveSlide() {
-        dispatch(removeSlide);
-    }
+    const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+            return;
+        }
 
-    function onAddTextElement() {
-        dispatch(addTextElement);
-    }
+        try {
+            const newEditorState = await importFromJSON(file);
+            dispatch(importAction(newEditorState)); // Диспатчим действие импорта
+        } catch (error) {
+            alert(error); // Показываем ошибку пользователю
+        }
+    };
 
-    function onChangeBackgroundColor() {
-        dispatch(changeBackgroundColor, color);
-        setIsColorPickerOpen(false);
-    }
-
-    function onDeleteElement() {
-        dispatch(deleteElement);
-    }
-
-    function onDeleteBackground() {
-        dispatch(deleteBackground);
-    }
-
-    function handleColorChange(event: React.ChangeEvent<HTMLInputElement>) {
-        setColor(event.target.value);
-    }
+    const exportFile = () => {
+        const editor = getEditor();
+        exportToFile(editor);
+    };
 
     return (
         <div className={styles.topPanel}>
@@ -60,79 +59,31 @@ function TopPanel({ title }: TopPanelProps) {
                 type="text"
                 maxLength={25}
                 defaultValue={title}
-                onBlur={onTitleChange}
+                onBlur={(e) => dispatch(renamePresentationTitle({ title: e.target.value }))}
             />
-            <input
-                ref={fileInputRef1} 
-                id="fileInput"
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={handleBackgorundUpload}
-            />
-            <input
-                ref={fileInputRef2} 
-                id="fileInput"
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={handleImageObjUpload}
-            />
-            <input
-                ref={importFileInputRef}
-                type="file"
-                accept=".json"
-                style={{ display: "none" }}
-                onChange={importFromJSON} 
-            />
-				<div className={styles.buttonContainer}>
-					<div className={styles.slideButtonBar}>
-						<Button className={styles.button} text="Add slide" onClick={onAddSlide} />
-						<Button className={styles.button} text="Delete slide" onClick={onRemoveSlide} />
-					</div>
-					<div className={styles.toolBar}>
-						<Button className={styles.button} text="Add text" onClick={onAddTextElement} />
-						<Button className={styles.button} text="Add image" onClick={() => fileInputRef2.current?.click()} />
-						<Button className={styles.button} text="Delete element" onClick={onDeleteElement} />
-						<Button
-							className={styles.button}
-							text="Change background"
-							onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
-						/>
-					</div>
-					{isColorPickerOpen && (
-						<div className={styles.colorPickerContainer}>
-							<input
-									type="color"
-									value={color}
-									onChange={handleColorChange}
-							/>
-							<Button
-									className={`${styles.button} ${styles.applyButton}`}
-									text="Apply Color"
-									onClick={onChangeBackgroundColor}
-							/>
-							<Button
-									className={`${styles.button} ${styles.applyButton}`}
-									text="Change background image"
-									onClick={() => fileInputRef1.current?.click()}
-							/>
-							<Button
-									className={`${styles.button} ${styles.applyButton}`}
-									text="Delete background"
-									onClick={onDeleteBackground}
-							/>
-						</div>
-					)}
-					<div className={styles.importExportBar}>
-						<Button className={styles.button} text="Export" onClick={exportToJSON} />
-						<Button className={styles.button} text="Import" onClick={() => importFileInputRef.current?.click()} />
-					</div>
-        		</div>
-		  </div>
+            <input ref={fileInputRef1} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleFileUpload(e, handleBackgroundUpload)} />
+            <input ref={fileInputRef2} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleFileUpload(e, handleImageObjUpload)} />
+            <input ref={importFileInputRef} type="file" accept=".json" style={{ display: "none" }} onChange={handleImport} />
+            <div className={styles.buttonContainer}>
+                <Button className={styles.button} text="Add slide" onClick={() => dispatch(addSlide())} />
+                <Button className={styles.button} text="Delete slide" onClick={() => dispatch(removeSlide())} />
+                <Button className={styles.button} text="Add text" onClick={() => dispatch(addTextElement())} />
+                <Button className={styles.button} text="Add image" onClick={() => fileInputRef2.current?.click()} />
+                <Button className={styles.button} text="Delete element" onClick={() => dispatch(deleteElement())} />
+                <Button className={styles.button} text="Change background" onClick={() => setIsColorPickerOpen(!isColorPickerOpen)} />
+                {isColorPickerOpen && (
+                    <div className={styles.colorPickerContainer}>
+                        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+                        <Button className={`${styles.button} ${styles.applyButton}`} text="Apply Color" onClick={() => dispatch(changeBackgroundColor({ color }))} />
+                        <Button className={`${styles.button} ${styles.applyButton}`} text="Change background image" onClick={() => fileInputRef1.current?.click()} />
+                        <Button className={`${styles.button} ${styles.applyButton}`} text="Delete background" onClick={() => dispatch(deleteBackground())} />
+                    </div>
+                )}
+                <Button className={styles.button} text="Export" onClick={() => exportFile()} />
+                <Button className={styles.button} text="Import" onClick={() => importFileInputRef.current?.click()} />
+            </div>
+        </div>
     );
 }
 
-export {
-    TopPanel,
-};
+export { TopPanel };

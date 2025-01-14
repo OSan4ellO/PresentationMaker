@@ -1,21 +1,26 @@
-import {SlideType} from "../../store/PresentationType.ts";
-import {Slide} from "../slide/Slide.tsx";
-import styles from './Workspace.module.css'
+import { Slide } from "../slide/Slide.tsx";
+import styles from './Workspace.module.css';
+import { useAppSelector } from '../../redux/hooks'; // Используем useAppSelector
 
+function Workspace() {
+    const selectedSlideId = useAppSelector((state) => state.editor.selection.selectedSlideId);
+    const slides = useAppSelector((state) => state.editor.presentation.slides);
+    const displayedSlide = slides.find((slide) => slide.id === selectedSlideId);
 
-type WorkspaceProps = {
-    slide: SlideType,
-	 selectedObjectId: string | null,
-}
+    if (!displayedSlide) {
+        return null;
+    }
 
-function Workspace({slide, selectedObjectId}: WorkspaceProps) {
     return (
         <div className={styles.workspace}>
-            <Slide slide={slide} isSelected={false} className={""} selectedObjectId={selectedObjectId}></Slide>
+            <Slide
+                slide={displayedSlide}
+                isSelected={false}
+                className={""}
+                selectedObjectId={null}
+            />
         </div>
-    )
+    );
 }
 
-export {
-	Workspace,
-}
+export { Workspace };
