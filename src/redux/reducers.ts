@@ -18,7 +18,7 @@ import {
 import { EditorType } from '../store/EditorType';
 import { addSlide } from '../store/addSlide';
 import { removeSlide } from '../store/removeSlide';
-import { setSelection } from '../store/setSelection';
+// import { setSelection } from '../store/setSelection';
 import { renamePresentationTitle } from '../store/renamePresentationTitle';
 import { addTextElement } from '../store/addTextElement';
 import { changeBackgroundColor } from '../store/changeBackgroundColor';
