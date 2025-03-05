@@ -71,7 +71,7 @@ function editorReducer(state: EditorType = initialState, action: any): EditorTyp
 		 case ADD_TEXT_ELEMENT:
 			  return addTextElement(state);
 
-			  case CHANGE_BACKGROUND_COLOR:
+		case CHANGE_BACKGROUND_COLOR:
             return changeBackgroundColor(state, action.payload.color);
 
 		 case DELETE_ELEMENT:

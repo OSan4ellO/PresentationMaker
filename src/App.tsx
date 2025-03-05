@@ -1,31 +1,19 @@
-// App.tsx
-import styles from './App.module.css';
-import { SlidesList } from "./view/slideList/SlidesList.tsx";
-import { TopPanel } from "./view/topPanel/TopPanel.tsx";
-import { Workspace } from './view/workSpace/Workspace.tsx';
-import { useAppSelector } from './redux/hooks.ts';
+import styles from './App.module.css'
+import {SlidesList} from "./view/slideList/SlideList.tsx";
+import {TopPanel} from "./view//TopPanel/TopPanel.tsx";
+import {Workspace} from "./view/Workspace/Workspace.tsx";
 
 function App() {
-    const presentation = useAppSelector((state) => state.editor.presentation);
-    const selection = useAppSelector((state) => state.editor.selection);
-
-    // Проверка на undefined
-    if (!presentation || !presentation.slides || !selection) {
-        return <div>Loading...</div>; 
-    }
-
-    const selectedSlideId = selection.selectedSlideId;
-    const displayedSlide = presentation.slides.find((slide) => slide.id === selectedSlideId);
-
-    return (
+    return ( 
         <>
-            <TopPanel title={presentation.title} />
+            <TopPanel></TopPanel> 
             <div className={styles.container}>
-                <SlidesList slides={presentation.slides} selectedSlideId={selectedSlideId} />
-                {displayedSlide && <Workspace slide={displayedSlide} />}
+            <SlidesList ></SlidesList>
+                <Workspace>
+                </Workspace>
             </div>
         </>
-    );
+    )
 }
 
-export default App;
+export default App

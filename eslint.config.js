@@ -18,12 +18,14 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
     },
     rules: {
+      "react-redux/no-unused-selector": "off",
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
       ],
-      "react/react-in-jsx-scope": "off",
+      "react-hooks/rules-of-hooks": "error", // Проверка правильности использования хуков
+      "react-hooks/exhaustive-deps": "warn",
     },
   }
 );

@@ -1,89 +1,234 @@
-// components/TopPanel.tsx
-import styles from './TopPanel.module.css';
-import { useRef, useState } from 'react';
-import { Button } from "../../components/button/Button.tsx";
-import { useAppDispatch } from '../../redux/hooks';
-import {
-    addSlide,
-    removeSlide,
-    addTextElement,
-    changeBackgroundColor,
-    deleteElement,
-    deleteBackground,
-    handleBackgroundUpload,
-    handleImageObjUpload,
-    renamePresentationTitle,
-    importFromJSON as importAction,
-} from '../../redux/actions.ts';
-import { exportToFile } from '../../store/export.ts';
-import { getEditor } from '../../store/editor.ts';
-import { importFromJSON } from '../../store/import.ts';
+import styles from './TopPanel.module.css'
+import {ImageButton, TextgeButton} from "../../Button/Button.tsx";
+import React, { useState, useRef } from 'react';
+import { importFromFile } from '../../store/storage/jsonUtils.ts';
+import { toBase64 } from '../../store/functions/converter.ts';
+import { useDispatch } from 'react-redux';
+import { addSlideAction, removeSlideAction, changeBackgroundAction, setColorAction } from '../../store/redux/actions/SlideActions.ts'
+import { renamePresentationTitleAction } from '../../store/redux/actions/presentationActions.ts';
+import { addImageAction, addTextAction , removeElementAction, changeColorAction, increaseSizeAction, decreaseSizeAction, changeFontFamilyAction } from '../../store/redux/actions/elementActions.ts';
+import { importAction, redoAction, undoAction } from '../../store/redux/actions/editorActions.ts';
+import { exportToFile } from '../../store/storage/jsonUtils.ts';
+import { getEditor } from '../../store/functions/editor.ts';
+import { useAppSelector } from '../hooks/useAppSelector.ts';
+import { generatePDF } from '../../store/functions/PDF/createPDF.ts';
 
-function TopPanel({ title }: { title: string }) {
-    const dispatch = useAppDispatch();
-    const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
-    const [color, setColor] = useState("#561ecb");
-    const fileInputRef1 = useRef<HTMLInputElement>(null);
-    const fileInputRef2 = useRef<HTMLInputElement>(null);
-    const importFileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, action: typeof handleBackgroundUpload | typeof handleImageObjUpload) => {
-        if (event.target.files && event.target.files[0]) {
-            dispatch(action({ file: event.target.files[0] }));
+import addSlideIcon from '../../../icons/multiple.png'
+import removeSldieIcon from '../../../icons/delete-symbol.png'
+import addTextIcon from '../../../icons/file.png'
+import addImageIcon from '../../../icons/image.png'
+import changeSlideColorIcon from '../../../icons/pallete.png'
+import importIcon from "../../../icons/import.png"
+import exportIcon from '../../../icons/export.png'
+import textColor from '../../../icons/textColor.png'
+import increaseText from '../../../icons/increaseSize.png'
+import decreaseText from '../../../icons/decreaseSize.png'
+import undo from '../../../icons/undo.png'
+import redo from '../../../icons/redo.png'
+import pdf from '../../../icons/pdf.png'
+
+
+function TopPanel() {
+    const [isActive, setIsActive] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const colorPicker = useRef<HTMLInputElement | null>(null);
+    const imageFileRef = useRef<HTMLInputElement | null>(null);
+    const [selectedColor, SetColor] = useState<string>("#FFFFFF");
+    const presentationFile = useRef<HTMLInputElement | null>(null);
+    const colorPallete = useRef<HTMLInputElement | null>(null);
+
+    const appDispath = useDispatch();
+    const editor = useAppSelector(state => state);
+    const selectedSlide = editor.current.selection.selectedSlideId;
+    const selectedElement = editor.current.selection.selectedElementId;
+    const title = editor.current.presentation.title;
+
+
+    const fonts = ["Arial", "Verdana", "Georgia", "Times New Roman", "Courier New"];
+
+
+    function onChangeFontFamily(event: React.ChangeEvent<HTMLSelectElement>) {
+        const newFontFamily = event.target.value;
+        if (selectedSlide && selectedElement) {
+          appDispath(changeFontFamilyAction(selectedSlide, selectedElement, newFontFamily));
+        } else {
+          alert("Выберите элемент для изменения шрифта.");
         }
-    };
+      }
 
-    const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    function TitleChange(event: React.FocusEvent<HTMLInputElement>) {
+      
+        const newTitle = event.target.value.trim() || "Новая презентация";
+      
+        appDispath(renamePresentationTitleAction(newTitle));
+      }
+      
+    function onAddSlide() {
+        appDispath(addSlideAction())
+    }
+    function onRemoveSlide() {
+        appDispath(removeSlideAction())
+    }
+
+    function onAddText() {
+        appDispath(addTextAction())
+    }
+    
+    async function onAddImage(event: React.ChangeEvent<HTMLInputElement>){
+        const file = event.target.files?.[0]; 
+        if (file) {
+            const base64 = await toBase64(file); 
+            appDispath(addImageAction(base64)); 
+            console.log("Selected file URL:", base64);
+        }
+    }
+
+    function onRemoveElement() {
+        appDispath(removeElementAction());
+    }
+    
+    function activateFileInput(){
+        if(fileInputRef.current){
+            fileInputRef.current.click();
+        }
+    }
+
+    function activateImageFileInput(){
+        if(imageFileRef.current){
+            imageFileRef.current.click();
+        }
+    }
+
+    function activateColorPicker(){
+        if(colorPicker.current){
+            colorPicker.current.click();
+        }
+        setIsActive(!isActive);
+    }
+
+    function onColorChange(event: React.ChangeEvent<HTMLInputElement>){
+        const color = event.target.value;
+        SetColor(color);
+    }
+
+    function applyColor(){
+        appDispath(setColorAction(selectedColor));
+        setIsActive(!isActive);
+    }
+
+    async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];
-        if (!file) {
-            return;
+        if (file) {
+            const fullPath = await toBase64(file); 
+            console.log("Selected file:", fullPath);
+            appDispath(changeBackgroundAction(fullPath));
         }
+    }
 
-        try {
-            const newEditorState = await importFromJSON(file);
-            dispatch(importAction(newEditorState)); // Диспатчим действие импорта
-        } catch (error) {
-            alert(error); // Показываем ошибку пользователю
+    function exportation(){
+        exportToFile(editor.current);
+    }
+
+    function activatePresentationFile(){
+        if (presentationFile.current) {
+            presentationFile.current.click();
         }
-    };
+    }
 
-    const exportFile = () => {
-        const editor = getEditor();
-        exportToFile(editor);
-    };
+    function handlerFileChange(event: React.ChangeEvent<HTMLInputElement>){
+        const file = event.target.files?.[0];
+        if(file){
+            importFromFile(file)
+                .then((parseContent) => {
+                    appDispath(importAction(parseContent))
+                })
+                .catch((error) => {
+                    console.error('Error importing presentation:', error);
+                    alert('Please check the file format.');
+                })
+                .finally(() => {
+                    event.target.value = '';
+                });  
+        }
+    }
+
+    function activateColorPalette() {
+        if(colorPallete.current){
+            colorPallete.current.click();
+        }
+    }
+
+    function onTextColorChange(event: React.ChangeEvent<HTMLInputElement>){
+        const newColor = event.target.value;
+        appDispath(changeColorAction(selectedSlide, selectedElement, newColor));
+    }
+
+    function onIncreaseTextSize(){
+        appDispath(increaseSizeAction(selectedSlide, selectedElement));
+    }
+
+    function onDecreaseTextSize(){
+        appDispath(decreaseSizeAction(selectedSlide, selectedElement));
+    }
+
+    function onUndo(){
+        appDispath(undoAction());
+    }
+    
+    function onRedo(){
+        appDispath(redoAction());
+    }
+
+    function PDF(){
+        appDispath(generatePDF(editor.current));
+    }
 
     return (
         <div className={styles.topPanel}>
-            <input
-                className={styles.title}
-                type="text"
-                maxLength={25}
-                defaultValue={title}
-                onBlur={(e) => dispatch(renamePresentationTitle({ title: e.target.value }))}
-            />
-            <input ref={fileInputRef1} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleFileUpload(e, handleBackgroundUpload)} />
-            <input ref={fileInputRef2} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleFileUpload(e, handleImageObjUpload)} />
-            <input ref={importFileInputRef} type="file" accept=".json" style={{ display: "none" }} onChange={handleImport} />
-            <div className={styles.buttonContainer}>
-                <Button className={styles.button} text="Add slide" onClick={() => dispatch(addSlide())} />
-                <Button className={styles.button} text="Delete slide" onClick={() => dispatch(removeSlide())} />
-                <Button className={styles.button} text="Add text" onClick={() => dispatch(addTextElement())} />
-                <Button className={styles.button} text="Add image" onClick={() => fileInputRef2.current?.click()} />
-                <Button className={styles.button} text="Delete element" onClick={() => dispatch(deleteElement())} />
-                <Button className={styles.button} text="Change background" onClick={() => setIsColorPickerOpen(!isColorPickerOpen)} />
-                {isColorPickerOpen && (
-                    <div className={styles.colorPickerContainer}>
-                        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
-                        <Button className={`${styles.button} ${styles.applyButton}`} text="Apply Color" onClick={() => dispatch(changeBackgroundColor({ color }))} />
-                        <Button className={`${styles.button} ${styles.applyButton}`} text="Change background image" onClick={() => fileInputRef1.current?.click()} />
-                        <Button className={`${styles.button} ${styles.applyButton}`} text="Delete background" onClick={() => dispatch(deleteBackground())} />
-                    </div>
-                )}
-                <Button className={styles.button} text="Export" onClick={() => exportFile()} />
-                <Button className={styles.button} text="Import" onClick={() => importFileInputRef.current?.click()} />
+            <input className={styles.title} type="text" maxLength={30} defaultValue={title} onBlur={TitleChange}/>
+            <div className={styles.buttons}>
+                <div className={styles.slidesActions}>
+                    <ImageButton className={styles.button} img={addSlideIcon} onClick={onAddSlide}></ImageButton>
+                    <ImageButton className={styles.button} img={removeSldieIcon} onClick={onRemoveSlide}></ImageButton>
+                    <ImageButton className={styles.button} img={addImageIcon} onClick={activateFileInput} ></ImageButton>
+                    <ImageButton className={`${styles.button} ${isActive ? styles['button--active']: ''}` } img={changeSlideColorIcon} onClick={activateColorPicker}></ImageButton>
+                    <input type="file" name="image" id="image" accept='.jpeg, .png, .jpg' onChange={onFileChange} ref={fileInputRef} style={{display: 'none'}}/>
+                    <input type="color" className={styles.colorPicker} id="colorPicker" value={selectedColor} ref={colorPicker} onChange={onColorChange} />
+                    {isActive && (
+                            <TextgeButton className={styles.apply} text={'Apply'} onClick={applyColor}></TextgeButton>
+                    )}
+                    <ImageButton className={styles.button} img={undo} onClick={onUndo}></ImageButton>
+                    <ImageButton className={styles.button} img={redo} onClick={onRedo}></ImageButton>
+                </div>
+                <div className={styles.elementActions}>
+                    <select className={styles.FontFamilySelector} onChange={onChangeFontFamily}>
+                        {fonts.map((font) => (
+                            <option key={font} value={font}>
+                                {font}
+                            </option>
+                        ))}
+                    </select>
+                    <ImageButton className={styles.button} img={addTextIcon} onClick={onAddText}></ImageButton>
+                    <ImageButton className={styles.button} img={increaseText} onClick={onIncreaseTextSize}></ImageButton>
+                    <ImageButton className={styles.button} img={decreaseText} onClick={onDecreaseTextSize}></ImageButton>
+                    <ImageButton className={styles.button} img={textColor} onClick={activateColorPalette}></ImageButton>
+                    <input type="color" className={styles.colorPallete} ref={colorPallete} onChange={onTextColorChange}/>
+                    <ImageButton className={styles.button} img={addImageIcon} onClick={activateImageFileInput}></ImageButton>
+                    <input type="file" name="imageElemnt" id="imageElement" accept='.jpeg, .png, .jpg'  onChange={onAddImage} ref={imageFileRef} style={{display: 'none'}}/>
+                    <ImageButton className={styles.button} img={removeSldieIcon} onClick={onRemoveElement}></ImageButton>
+                </div>
+                <div className={styles.presentationActions}>
+                    <ImageButton className={styles.button} img={exportIcon} onClick={exportation}></ImageButton>
+                    <ImageButton className={styles.button} img={importIcon} onClick={activatePresentationFile}></ImageButton>
+                    <input type="file" name="presentationFile" ref={presentationFile} style={{display: 'none'}} onChange={handlerFileChange}/>
+                    <ImageButton className={styles.button} img={pdf} onClick={PDF}></ImageButton>
+                </div>
             </div>
         </div>
-    );
+    )
 }
 
-export { TopPanel };
+export {
+    TopPanel,
+}

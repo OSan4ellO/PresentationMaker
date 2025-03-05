@@ -1,64 +1,148 @@
-// components/Slide.tsx
-import { TextObject } from "./TextObject.tsx";
-import { ImageObject } from "./ImageObject.tsx";
-import styles from './Slide.module.css';
-import { CSSProperties } from "react";
+import {SlideType} from "../../store/functions/PresentationType.ts";
+import {TextObject} from "./Elements/TextObject.tsx";
+import {ImageObject} from "./Elements/ImageObject.tsx";
+import styles from './Slide.module.css'
+import {CSSProperties} from "react";
+import { SelectionType } from "../../store/functions/EditorType.ts";
+import {useDragAndDrop} from "../hooks/useDND.ts"
+import { useResizeElement } from "../hooks/useResize.ts";
+import { setSelectionAction } from "../../store/redux/actions/presentationActions.ts";
+import { useDispatch } from "react-redux";
 
-const SLIDE_WIDTH = 935; // Ширина слайда
-const SLIDE_HEIGHT = 525; // Высота слайда
+const SLIDE_WIDTH = 935
+const SLIDE_HEIGHT = 525
 
 type SlideProps = {
-    slide: {
-        id: string; // slideId
-        objects: Array<{ id: string; type: string; x: number; y: number }>;
-        background: { type: string; color?: string; src?: string }; // Фон слайда
-    };
-    scale?: number;
-    isSelected: boolean;
-    className: string;
-    selectedObjectId: string | null; // selectedObjectId передается сюда
-};
+    slide: SlideType | null,
+    scale?: number,
+    isSelected: boolean,
+    className: string,
+    selectedElementId: string | null,
+    selection?: SelectionType,
+    showResizeHandles?: boolean
+}
 
-function Slide({ slide, scale = 1, isSelected, className, selectedObjectId }: SlideProps) {
-    // Стили для слайда
-    const slideStyles: CSSProperties = {
-        position: 'relative',
+function Slide({slide, scale = 1, isSelected, className, selectedElementId, showResizeHandles = true}: SlideProps) {
+
+    const appDispatch = useDispatch();
+
+    const { isDragging, handleElementMD, handleElementMM, handleElementMU } = useDragAndDrop({ slideId: slide?.id ?? ''});
+    const { isResizing, handleResizeMD, handleResizeMM, handleResizeMU} = useResizeElement({ slideId: slide?.id ?? ''});
+
+    function onObjectClick(objectId: string): void{
+        const selection: SelectionType = {
+            selectedSlideId: slide?.id || null,
+            selectedElementId: objectId,
+        }
+        appDispatch(setSelectionAction(selection));
+    }
+
+    const handleElementBlur = () => {
+        const selection: SelectionType = {
+            selectedSlideId: slide?.id || null,
+            selectedElementId: null,
+        }
+        appDispatch(setSelectionAction(selection));
+    };
+
+    if (!slide) {
+        return null;
+    }
+
+    const slideStyles:CSSProperties = {
+        backgroundColor: slide.background.type == 'solid' ? slide.background.color: '#FFFFFF',
+        backgroundImage: slide.background.type == 'img' ? `url(${slide.background.src})`: 'none',
         width: `${SLIDE_WIDTH * scale}px`,
         height: `${SLIDE_HEIGHT * scale}px`,
-        backgroundColor: slide.background.type === 'solid' ? slide.background.color : 'transparent', // Фон для типа 'solid'
-        backgroundImage: slide.background.type === 'image' ? `url(${slide.background.src})` : 'none', // Фон для типа 'image'
-        backgroundSize: 'cover', // Чтобы изображение фона покрывало весь слайд
-        border: isSelected ? '3px solid #8A2094' : '1px solid #ccc', // Обводка для выделения
-    };
-
+        position: 'relative',
+    }
+    if (isSelected) {
+        slideStyles.border = '3px solid #0b57d0'
+    }
     return (
-        <div style={slideStyles} className={`${styles.slide} ${className}`}>
-            {slide.objects?.map((slideObject) => {
-                switch (slideObject.type) {
-                    case "text":
-                        return (
-                            <TextObject
-                                key={slideObject.id}
-                                textObject={{ ...slideObject, slideId: slide.id }} // Передаем slideId
-                                scale={scale}
-                                isSelected={slideObject.id === selectedObjectId} // Передаем isSelected
-                            />
-                        );
-                    case "image":
-                        return (
-                            <ImageObject
-                                key={slideObject.id}
-                                imageObject={{ ...slideObject, slideId: slide.id }} // Передаем slideId
-                                scale={scale}
-                                isSelected={slideObject.id === selectedObjectId} // Передаем isSelected
-                            />
-                        );
-                    default:
-                        return null;
+        <div
+            style={slideStyles}
+            className={`${styles.slide} ${className}`}
+            onMouseMove={(event) => {
+                if (isResizing) {
+                    handleResizeMM(event);
+                } else if (isDragging) {
+                    handleElementMM(event);
                 }
+            }}
+            onMouseUp={() => {
+                handleElementMU();
+                handleResizeMU();
+            }}
+            onClick={handleElementBlur}>
+            {slide.objects.map(SlideElement => {
+                const isSelectionElem = SlideElement.id === selectedElementId;
+                return (
+                    <div
+                        key={SlideElement.id}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onObjectClick(SlideElement.id);
+                        }}
+                        onMouseDown={(e) => handleElementMD(e, SlideElement.id)}
+                        style={{ position: 'relative' }}>
+                        {SlideElement.type === "text" && (
+                            <TextObject
+                                textObject={SlideElement}
+                                scale={scale}
+                                isSelected={isSelectionElem}
+                            />
+                        )}
+                        {SlideElement.type === "image" && (
+                            <ImageObject
+                                imageObject={SlideElement}
+                                scale={scale}
+                                isSelected={isSelectionElem}
+                            />
+                        )}
+                        {isSelectionElem && showResizeHandles && (
+                            <>
+                                <div className={`${styles.resizeHandle} ${styles.topLeft}`}
+                                onMouseDown={(event) => handleResizeMD(event, SlideElement.id, 'top-left')}
+                                style={{position: 'absolute', top: SlideElement.y - 5, left: SlideElement.x - 5}}/>
+
+                                <div className={`${styles.resizeHandle} ${styles.topRight}`}
+                                onMouseDown={(event) => handleResizeMD(event, SlideElement.id, 'top-right')}
+                                style={{position: 'absolute', top: SlideElement.y - 5, left: SlideElement.x + SlideElement.width - 3}}/>
+
+                                <div className={`${styles.resizeHandle} ${styles.bottomLeft}`}
+                                onMouseDown={(event) => handleResizeMD(event, SlideElement.id, 'bottom-left')}
+                                style={{position: 'absolute', top: SlideElement.y + SlideElement.height - 3, left: SlideElement.x - 6}}/>
+
+                                <div className={`${styles.resizeHandle} ${styles.bottomRight}`}
+                                onMouseDown={(event) => handleResizeMD(event, SlideElement.id, 'bottom-right')}
+                                style={{position: 'absolute', top: SlideElement.y + SlideElement.height - 3, left: SlideElement.x + SlideElement.width - 3}}/>
+
+                                <div className={`${styles.resizeHandle} ${styles.middleLeft}`}
+                                onMouseDown={(event) => handleResizeMD(event, SlideElement.id, 'middle-left')}
+                                style={{position: 'absolute', top: SlideElement.y + SlideElement.height / 2, left: SlideElement.x - 6}}/>
+
+                                <div className={`${styles.resizeHandle} ${styles.middleRight}`}
+                                onMouseDown={(event) => handleResizeMD(event, SlideElement.id, 'middle-right')}
+                                style={{position: 'absolute', top: SlideElement.y + SlideElement.height / 2, left: SlideElement.x + SlideElement.width - 3}}/>
+
+                                <div className={`${styles.resizeHandle} ${styles.middleTop}`}
+                                onMouseDown={(event) => handleResizeMD(event, SlideElement.id, 'middle-top')}
+                                style={{position: 'absolute', top: SlideElement.y - 5, left: SlideElement.x + SlideElement.width / 2}}/>
+
+                                <div className={`${styles.resizeHandle} ${styles.middleBottom}`}
+                                onMouseDown={(event) => handleResizeMD(event, SlideElement.id, 'middle-bottom')}
+                                style={{position: 'absolute', top: SlideElement.y + SlideElement.height - 3, left: SlideElement.x + SlideElement.width / 2}}/>
+                            </>
+                            )}
+                    </div>
+                );
             })}
         </div>
     );
+    
 }
 
-export { Slide };
+export {
+    Slide
+}

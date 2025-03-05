@@ -1,4 +1,5 @@
 import { editor } from './data';
+import { EditorType } from './EditorType';
 import { editorSchema } from './schema'; // Импортируем схему для валидации
 import Ajv from 'ajv'; // Импортируем Ajv для валидации
 
@@ -27,7 +28,7 @@ function getEditor() {
     return _editor;
 }
 
-function setEditor(newEditor) {
+function setEditor(newEditor: EditorType) {
     _editor = newEditor;
     // Сохраняем состояние в localStorage при каждом изменении
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newEditor));
