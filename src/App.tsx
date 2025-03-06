@@ -1,7 +1,7 @@
 import styles from './App.module.css'
 import {SlidesList} from "./view/slideList/SlideList.tsx";
-import {TopPanel} from "./view//TopPanel/TopPanel.tsx";
-import {Workspace} from "./view/Workspace/Workspace.tsx";
+import { TopPanel } from './view/topPanel/TopPanel.tsx';
+import { Workspace } from './view/workSpace/Workspace.tsx';
 
 function App() {
     return ( 

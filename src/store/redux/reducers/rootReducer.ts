@@ -19,8 +19,6 @@ const rootReducer = (state: HistoryManeger = {past: [], current: editor, future:
     if(
         state.isChanging !== action.payload &&
         state.isChanging === false &&
-        action.type !== EditorActions.UNDO && 
-        action.type !== EditorActions.REDO &&
         action.type !== EditorActions.SET_EDITOR
     ){
         newState.past = [...newState.past, state.current];

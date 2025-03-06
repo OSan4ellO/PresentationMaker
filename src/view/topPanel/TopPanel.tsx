@@ -7,9 +7,9 @@ import { useDispatch } from 'react-redux';
 import { addSlideAction, removeSlideAction, changeBackgroundAction, setColorAction } from '../../store/redux/actions/SlideActions.ts'
 import { renamePresentationTitleAction } from '../../store/redux/actions/presentationActions.ts';
 import { addImageAction, addTextAction , removeElementAction, changeColorAction, increaseSizeAction, decreaseSizeAction, changeFontFamilyAction } from '../../store/redux/actions/elementActions.ts';
-import { importAction, redoAction, undoAction } from '../../store/redux/actions/editorActions.ts';
+import { importAction} from '../../store/redux/actions/editorActions.ts';
 import { exportToFile } from '../../store/storage/jsonUtils.ts';
-import { getEditor } from '../../store/functions/editor.ts';
+import { getEditor } from '../../store/functions/editor.ts';``
 import { useAppSelector } from '../hooks/useAppSelector.ts';
 import { generatePDF } from '../../store/functions/PDF/createPDF.ts';
 
@@ -24,8 +24,6 @@ import exportIcon from '../../../icons/export.png'
 import textColor from '../../../icons/textColor.png'
 import increaseText from '../../../icons/increaseSize.png'
 import decreaseText from '../../../icons/decreaseSize.png'
-import undo from '../../../icons/undo.png'
-import redo from '../../../icons/redo.png'
 import pdf from '../../../icons/pdf.png'
 
 
@@ -172,13 +170,6 @@ function TopPanel() {
         appDispath(decreaseSizeAction(selectedSlide, selectedElement));
     }
 
-    function onUndo(){
-        appDispath(undoAction());
-    }
-    
-    function onRedo(){
-        appDispath(redoAction());
-    }
 
     function PDF(){
         appDispath(generatePDF(editor.current));
@@ -198,8 +189,6 @@ function TopPanel() {
                     {isActive && (
                             <TextgeButton className={styles.apply} text={'Apply'} onClick={applyColor}></TextgeButton>
                     )}
-                    <ImageButton className={styles.button} img={undo} onClick={onUndo}></ImageButton>
-                    <ImageButton className={styles.button} img={redo} onClick={onRedo}></ImageButton>
                 </div>
                 <div className={styles.elementActions}>
                     <select className={styles.FontFamilySelector} onChange={onChangeFontFamily}>
